@@ -3,6 +3,7 @@ from flask_restful import Api
 
 from resources.homepage import Homepage
 from resources.search import Search
+from resources.auth import Login
 
 import os
 
@@ -11,6 +12,10 @@ api = Api(app)
 
 api.add_resource(Homepage, '/')
 api.add_resource(Search, '/search')
+api.add_resource(Login, '/login')
+
+
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 9898))
     app.run(host='127.0.0.1', port=port, debug=True)
