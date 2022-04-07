@@ -22,7 +22,7 @@ class Restaurant(Resource):
     __image_table_name__ = "Images"
 
     def get(self):
-        errors = RestaurantQuerySchema.validate(request.forms)
+        errors = RestaurantQuerySchema.validate(request.args)
         if errors:
             print(str(errors))
             abort(400, str(errors))
