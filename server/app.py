@@ -6,6 +6,7 @@ from resources.homepage import Homepage
 from resources.search import Search
 from resources.auth import Login
 from resources.auth import Signup
+from resources.restaurant import Restaurant
 
 import os
 
@@ -16,6 +17,7 @@ api.add_resource(Homepage, '/')
 api.add_resource(Search, '/search')
 api.add_resource(Login, '/login')
 api.add_resource(Signup, '/signup')
+api.add_resource(Restaurant, '/restaurant')
 
 
 if __name__ == '__main__':

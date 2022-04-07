@@ -1,10 +1,8 @@
-from email import header
-from http.client import REQUEST_ENTITY_TOO_LARGE
 import string
 from flask_restful import Resource
 from flask import (
-    request, abort, jsonify, session,
-    redirect, url_for, render_template,
+    request, abort, session,
+    redirect, render_template,
     make_response, flash
 )
 from marshmallow import Schema, fields

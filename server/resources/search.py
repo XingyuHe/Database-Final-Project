@@ -40,8 +40,6 @@ class Search(Resource):
             print("failed to connect to database")
             abort(500, "<p>Database Error</p>")
 
-        # TODO: perhaps change this for db_conn to parse arg
-        # this is to prevent weird parsing
         query = "SELECT * FROM {table_name} WHERE name=%s".format(
             table_name=cls.__search_table_name__)
 
