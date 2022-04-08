@@ -8,5 +8,6 @@ def create_app():
     app.config.from_mapping(
         SECRET_KEY="peterhe-zhehua"
     )
+    app.sercre_key = os.urandom(12)
 
     return app
