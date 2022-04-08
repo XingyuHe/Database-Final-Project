@@ -22,6 +22,10 @@ loginQuerySchema = LoginQuerySchema()
 class Login(Resource):
 
     def get(self):
+
+        if 'username' in session:
+            return "user {} is already logged in".format(session['username'])
+
         headers = {'Content-Type': 'text/html'}
         return make_response(render_template("login.html"), 200, headers)
         # TODO return message to front end to require a post method

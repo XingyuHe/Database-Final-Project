@@ -1,5 +1,4 @@
 import string
-from typing_extensions import Required
 from flask_restful import Resource
 from flask import (
     request, abort, session,
