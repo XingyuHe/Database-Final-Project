@@ -1,4 +1,6 @@
 import string
+from functools import wraps
+
 from flask_restful import Resource
 from flask import (
     request, abort, session,
@@ -12,6 +14,18 @@ from werkzeug.security import generate_password_hash
 from db import db_engine
 from sqlalchemy import exc
 
+def is_login():
+    return 'username' in session
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not is_login():
+            headers = {'Content-Type': 'text/html'}
+            return make_response(render_template("login.html"), 200, headers)
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 class LoginQuerySchema(Schema):
     username = fields.Str(required=True)
@@ -21,15 +35,9 @@ loginQuerySchema = LoginQuerySchema()
 
 class Login(Resource):
 
+    @login_required
     def get(self):
-
-        if 'username' in session:
-            return "user {} is already logged in".format(session['username'])
-
-        headers = {'Content-Type': 'text/html'}
-        return make_response(render_template("login.html"), 200, headers)
-        # TODO return message to front end to require a post method
-        # this is currently or testing purpose
+        return "user {} is already logged in".format(session['username'])
 
     def post(self):
         print("login-args:", request.form)
@@ -140,7 +148,8 @@ class Signup(Resource):
         headers = {'Content-Type': 'text/html'}
         if signup_error == None:
             # signup succeeds
-            return make_response(render_template("login.html"), 200, headers)
+            return make_response(redirect("login"), 303)
+            # return make_response(render_template("login.html"), 200, headers)
         else:
             # signup fails
             flash(signup_error)
