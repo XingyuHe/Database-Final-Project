@@ -1,6 +1,5 @@
-from sqlite3 import IntegrityError
 from flask_restful import Resource
-from flask import abort, session, request
+from flask import abort, session, request,  make_response, render_template
 from marshmallow import Schema, fields
 
 from db import db_engine, table_schema
@@ -26,7 +25,7 @@ class Reservation(Resource):
         print("restaurant {restaurant_id} found: {restaurant}".format(
             restaurant_id=restaurant_id, restaurant=restaurant_found))
 
-        return restaurant_found
+        return make_response(render_template("reservation.html", data=restaurant_found), 200, {'Content-Type': 'text/html'})
 
     def post(self, restaurant_id):
 
@@ -81,7 +80,8 @@ class Reservation(Resource):
             abort(500, "<p>Database Error</p>")
 
         insert_query = """
-        INSERT INTO Reservations (consumer_id, restaurant_id, party_size, party_time) VALUES (%s, %s, %s, %s)
+        INSERT INTO Reservations (consumer_id, restaurant_id, party_size, party_time)
+        VALUES (%s, %s, %s, %s)
         """
 
         try:

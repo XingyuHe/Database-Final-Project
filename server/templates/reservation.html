@@ -1,0 +1,11 @@
+{% block content %}
+<p>Making reservation: {{data.restaurant_name, data.street_address, data.city, data.telephone}}</p>
+<p>party_time format is "2022-05-01 20:00"</p>
+<form method="post">
+    <label for="party_size">party_size</label>
+    <input name="party_size" id="party_size" placeholder="2">
+    <label for="party_time">party_time</label>
+    <input name="party_time" id="party_time" placeholder="2022-05-01 20:00">
+    <input type="submit" value="Reserve">
+</form>
+{% endblock %}
