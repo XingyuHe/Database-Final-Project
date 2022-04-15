@@ -1,6 +1,7 @@
 from flask_restful import Resource
+from flask import make_response, render_template
 
 class Homepage(Resource):
 
     def get(self):
-        return "<p>Database Final Project by Peter He and Zhe Hua</p>"
+        return make_response(render_template("home.html"), 200, {'Content-Type': 'text/html'})

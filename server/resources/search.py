@@ -1,5 +1,5 @@
 from flask_restful import Resource
-from flask import request, abort, jsonify
+from flask import request, abort, jsonify, make_response, render_template
 from marshmallow import Schema, fields
 
 from db import db_engine, table_schema
@@ -28,7 +28,7 @@ class Search(Resource):
         errors = searchQuerySchema.validate(request.args)
         if errors:
             print(str(errors))
-            abort(400, str(errors))
+            return make_response(render_template("search.html"), 200, {'Content-Type': 'text/html'})
 
         restaurants_found = self.find_restaurants(request.args)
         if restaurants_found:
