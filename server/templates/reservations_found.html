@@ -1,0 +1,13 @@
+{% block content %}
+{% for item in data %}
+<div>Reservation:</div>
+<ul>
+    <li>restaurant name: {{item.restaurant_name}}</li>
+    <li>party size: {{item.party_size}}</li>
+    <li>reservation time: {{item.party_time}}</li>
+    <li>addr: {{item.street_addr}}</li>
+    <li>telephone: {{item.telephone}}</li>
+</ul>
+
+{% endfor %}
+{% endblock %}

@@ -8,6 +8,7 @@ from resources.auth import Login
 from resources.auth import Signup
 from resources.restaurant import Restaurant
 from resources.reservation import Reservation
+from resources.my_reservations import MyReservation
 
 import os
 
@@ -20,6 +21,7 @@ api.add_resource(Login, '/login')
 api.add_resource(Signup, '/signup')
 api.add_resource(Restaurant, '/restaurant/<int:restaurant_id>')
 api.add_resource(Reservation, '/reservation/<int:restaurant_id>')
+api.add_resource(MyReservation, '/my_reservations')
 
 
 if __name__ == '__main__':

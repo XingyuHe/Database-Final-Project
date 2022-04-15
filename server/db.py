@@ -23,6 +23,7 @@ class TableSchema:
         self.cuisine_restaurant_relationship_schema = self.get_schema(db_conn, 'cuisinesrestaurantsrelationship')
         self.hashtag_consumer_restaurant_relationship_schema = self.get_schema(db_conn, 'hashtagsconsumersrestaurantsrelationship')
         self.hashtag_schema = self.get_schema(db_conn, 'hashtags')
+        self.reservation_schema = self.get_schema(db_conn, 'reservations')
         db_conn.close()
 
     @classmethod

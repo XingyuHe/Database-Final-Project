@@ -30,7 +30,7 @@ class Reservation(Resource):
     def post(self, restaurant_id):
 
         if 'username' not in session:
-            return f"<p>Please log in first</p>"
+            return  make_response(render_template("please_login.html"), 200, {'Content-Type': 'text/html'})
 
         consumer_id = session['consumer_id']
         errors = reservationQuerySchema.validate(request.form)
@@ -44,7 +44,7 @@ class Reservation(Resource):
         if result:
             return f"{session['username']} successfully made a reservation at restaurant_id = {restaurant_id} for a party of {request.form['party_size']} on {request.form['party_time']}"
         else:
-            return f"<p>reservation failed</p>"
+            return f"failed to make a reservation"
 
     @classmethod
     def find_restaurant(cls, restaurant_id):
