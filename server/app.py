@@ -18,7 +18,7 @@ api.add_resource(Homepage, '/')
 api.add_resource(Search, '/search')
 api.add_resource(Login, '/login')
 api.add_resource(Signup, '/signup')
-api.add_resource(Restaurant, '/restaurant')
+api.add_resource(Restaurant, '/restaurant/<int:restaurant_id>')
 api.add_resource(Reservation, '/reservation/<int:restaurant_id>')
 
 

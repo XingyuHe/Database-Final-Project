@@ -5,13 +5,9 @@ from flask import (
     redirect, render_template,
     make_response, flash, jsonify
 )
-from marshmallow import Schema, fields
 
-from db import db_engine
-from sqlalchemy import exc
+from db import db_engine, table_schema
 
-class RestaurantQuerySchema(Schema):
-    restaurant_id = fields.Int(required=True)
 
 class Restaurant(Resource):
     __restaurant_table_name__ = "RESTAURANTS"
@@ -20,11 +16,7 @@ class Restaurant(Resource):
     __image_consumer_restaurant_table_name__ = "ImagesConsumersRestaurantsRelationship"
     __image_table_name__ = "Images"
 
-    def get(self):
-        errors = RestaurantQuerySchema.validate(request.args)
-        if errors:
-            print(str(errors))
-            abort(400, str(errors))
+    def get(self, restaurant_id):
 
         try:
             db_conn = db_engine.connect()
@@ -32,14 +24,13 @@ class Restaurant(Resource):
             print("failed to connect to database")
             abort(500, "<p>Database Error</p>")
 
-        restaurant_attr = self.getRestaurantAttributes(db_conn, request.form['restaurant_id'])
-        reviews = self.getReviews(db_conn, request.form['restaurant_id'])
+        restaurant_attr = self.getRestaurantAttributes(db_conn, restaurant_id)
+        reviews = self.getReviews(db_conn, restaurant_id)
 
         return jsonify({
             "restaurant_attributes": restaurant_attr,
             "reviews": reviews
         })
-
 
     @classmethod
     def getReviews(cls, db_conn, restaurant_id):
@@ -47,10 +38,10 @@ class Restaurant(Resource):
         query_rows = db_conn.execute(
             """
             SELECT *
-            FROM (?) AS R
-            WHERE R.restaurant_id = %i
-            """,
-            cls.__review_consumer_table_name, restaurant_id
+            FROM {table_name} AS R
+            WHERE R.restaurant_id = %s
+            """.format(table_name=cls.__review_consumer_table_name),
+            restaurant_id
         ).fetchall()
 
         review_result = []
@@ -73,10 +64,9 @@ class Restaurant(Resource):
             review_img_query_rows = db_conn.execute(
                 """
                 SELECT I.image_id
-                FROM (?) AS I
-                WHERE I.consumer_id = %i AND I.restaurant_id = %i
-                """,
-                cls.__image_consumer_restaurant_table_name__,
+                FROM {table_name} AS I
+                WHERE I.consumer_id = %s AND I.restaurant_id = %s
+                """.format(table_name=cls.__image_consumer_restaurant_table_name__),
                 row[0], row[1]
             ).fetchall()
 
@@ -84,10 +74,10 @@ class Restaurant(Resource):
                 img_result = db_conn.execute(
                     """
                     SELECT url
-                    FROM (?) AS I
-                    WHERE I.image_id = %i
-                    """,
-                    cls.__image_table_name__, img_row[0]
+                    FROM {table_name} AS I
+                    WHERE I.image_id = %s
+                    """.format(table_name=cls.__image_table_name__),
+                    img_row[0]
                 ).fetchone()
 
                 review_result[-1]["image_urls"].append(img_result[0])
@@ -98,21 +88,21 @@ class Restaurant(Resource):
     def getRestaurantAttributes(cls, db_conn, restaurant_id):
 
         query_row = db_conn.execute(
-            "SELECT * FROM (?) WHERE restaurant_id=%i",
-            cls.__restaurant_table_name__, restaurant_id
+            "SELECT * FROM {table_name_1} AS R, {table_name_2} AS A WHERE R.restaurant_id=%s AND R.zipcode = A.zipcode".format(
+                table_name_1=cls.__restaurant_table_name__,
+                table_name_2=cls.__area_table_name__),
+            restaurant_id
         ).fetchone()
 
-        area_query = "SELECT zipcode, city, state from {table_name} WHERE area_id=%s".format(
-            table_name=cls.__area_table_name__)
-        result = db_conn.execute(area_query, query_row[3])
-        area_result = result.fetchone()
-        print("area_result: ", area_result)
+        restaurant = dict(
+            zip(table_schema.restaurant_schema + table_schema.area_schema, query_row))
 
-        query_result = {'restaurant_id': query_row[0],
-                        'name': query_row[2],
-                        'zipcode': area_result[0],
-                        'city': area_result[1],
-                        'state': area_result[2],
-                        'intro': query_row[5]}
+        trimmed_restaurant = {
+            'restaurant_id': restaurant['restaurant_id'],
+            'name': restaurant['restaurant_name'],
+            'zipcode': restaurant['zipcode'],
+            'city': restaurant['city'],
+            'state': restaurant['state'],
+            'intro': restaurant['intro']}
 
-        return query_result
+        return trimmed_restaurant
