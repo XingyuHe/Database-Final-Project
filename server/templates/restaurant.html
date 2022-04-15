@@ -1,0 +1,40 @@
+{% block content %}
+<div>{{data.att.restaurant_name}}</div>
+<div>
+    <a href='{{data.att.profile_image_url}}'>
+        <button>{{data.att.profile_image_url}}</button>
+    </a>
+</div>
+<div>
+    <a href='/reservation/{{data.att.restaurant_id}}'>
+        <button>Make a Reservation</button>
+    </a>
+</div>
+<div>
+    <p>Restaurant Details</p>
+    <ul>
+        <li>intro: {{data.att.intro}}</li>
+        <li>rating: {{data.att.rating}}</li>
+        <li>price: {{data.att.price}}</li>
+        <li>spicy: {{data.att.spicy}}</li>
+        <li>cuisines: {{data.att.cuisine_name}}</li>
+        <li>hashtags: {{data.att.hashtag_name}}</li>
+        <li>addr: {{data.att.street_address}}, {{data.att.city}}, {{data.att.state}}</li>
+        <li>telephone: {{data.att.telephone}}</li>
+    </ul>
+</div>
+<div>
+    <p>Reviews</p>
+    {% for item in data.rev %}
+    <ul>
+        <li>overall score: {{item.overall_score}}</li>
+        <li>food score: {{item.food_quality_score}}</li>
+        <li>service score: {{item.service_score}}</li>
+        <li>value score: {{item.value_score}}</li>
+        <li>content: {{item.content}}</li>
+        <li>original date: {{item.original}}</li>
+        <li>last updated date: {{item.last_updated_date}}</li>
+    </ul>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import (
-    abort, jsonify
+    abort, jsonify, make_response, render_template
 )
 
 from db import db_engine, table_schema
@@ -12,6 +12,10 @@ class Restaurant(Resource):
     __area_table_name__ = "AREAS"
     __image_consumer_restaurant_table_name__ = "ImagesConsumersRestaurantsRelationship"
     __image_table_name__ = "Images"
+    __cuisines_table_name__ = "CUISINES"
+    __cuisinesrestaurantsrelationship_table_name__ = "CuisinesRestaurantsRelationship"
+    __hashtagsconsumersrestaurantsrelationship_table_name__ = "HashtagsConsumersRestaurantsRelationship"
+    __hashtags_table_name__ = "HASHTAGS"
 
     def get(self, restaurant_id):
 
@@ -24,10 +28,15 @@ class Restaurant(Resource):
         restaurant_attr = self.getRestaurantAttributes(db_conn, restaurant_id)
         reviews = self.getReviews(db_conn, restaurant_id)
 
-        return jsonify({
-            "restaurant_attributes": restaurant_attr,
-            "reviews": reviews
-        })
+        attr_review_data = {
+            "att": restaurant_attr,
+            "rev": reviews
+        }
+
+        return make_response(
+            render_template(
+                "restaurant.html", data=attr_review_data), 200, {'Content-Type': 'text/html'})
+
 
     @classmethod
     def getReviews(cls, db_conn, restaurant_id):
@@ -85,21 +94,35 @@ class Restaurant(Resource):
     def getRestaurantAttributes(cls, db_conn, restaurant_id):
 
         query_row = db_conn.execute(
-            "SELECT * FROM {table_name_1} AS R, {table_name_2} AS A WHERE R.restaurant_id=%s AND R.zipcode = A.zipcode".format(
+            """SELECT *
+            FROM {table_name_1} AS R, {table_name_2} AS A,
+            {table_name_3} AS CR, {table_name_4} AS C,
+            {table_name_5} AS HR, {table_name_6} AS H
+            WHERE R.restaurant_id=%s
+                AND R.zipcode = A.zipcode
+                AND CR.restaurant_id = R.restaurant_id
+                AND C.cuisine_id = CR.cuisine_id
+                AND HR.restaurant_id = R.restaurant_id
+                AND H.hashtag_id = HR.hashtag_id
+            """.format(
                 table_name_1=cls.__restaurant_table_name__,
-                table_name_2=cls.__area_table_name__),
+                table_name_2=cls.__area_table_name__,
+                table_name_3=cls.__cuisinesrestaurantsrelationship_table_name__,
+                table_name_4=cls.__cuisines_table_name__,
+                table_name_5=cls.__hashtagsconsumersrestaurantsrelationship_table_name__,
+                table_name_6=cls.__hashtags_table_name__
+            ),
             restaurant_id
         ).fetchone()
 
+
+        schema = table_schema.restaurant_schema + table_schema.area_schema + \
+            table_schema.cuisine_restaurant_relationship_schema + \
+            table_schema.cuisine_schema + \
+            table_schema.hashtag_consumer_restaurant_relationship_schema + \
+            table_schema.hashtag_schema
+
         restaurant = dict(
-            zip(table_schema.restaurant_schema + table_schema.area_schema, query_row))
+            zip(schema, query_row))
 
-        trimmed_restaurant = {
-            'restaurant_id': restaurant['restaurant_id'],
-            'name': restaurant['restaurant_name'],
-            'zipcode': restaurant['zipcode'],
-            'city': restaurant['city'],
-            'state': restaurant['state'],
-            'intro': restaurant['intro']}
-
-        return trimmed_restaurant
+        return restaurant
