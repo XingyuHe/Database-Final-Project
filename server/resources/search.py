@@ -32,7 +32,7 @@ class Search(Resource):
 
         restaurants_found = self.find_restaurants(request.args)
         if restaurants_found:
-            return jsonify(restaurants_found)
+            return make_response(render_template("restaurants_found.html", data=restaurants_found), 200, {'Content-Type': 'text/html'})
 
         return {'message': "No results found"}
 

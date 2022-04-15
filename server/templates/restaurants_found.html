@@ -1,0 +1,17 @@
+{% block content %}
+<ul>
+    {% for item in data %}
+    <li>
+        <a href='/restaurant/{{item.restaurant_id}}'>
+            <button>restaurant name: {{item.restaurant_name}}</button>
+        </a>
+    </li>
+    <li>restaurant name: {{item.restaurant_name}}</li>
+    <li>rating: {{item.rating}}</li>
+    <li>price: {{item.price}}</li>
+    <li>cuisines: {{item.cuisine_name}}</li>
+    <li>hashtags: {{item.hashtag_name}}</li>
+    <li>addr: {{item.city}}, {{item.state}}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,9 +1,6 @@
-import string
 from flask_restful import Resource
 from flask import (
-    request, abort, session,
-    redirect, render_template,
-    make_response, flash, jsonify
+    abort, jsonify
 )
 
 from db import db_engine, table_schema
