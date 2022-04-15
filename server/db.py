@@ -16,15 +16,17 @@ class TableSchema:
     """
 
     def __init__(self):
+        db_conn = db_engine.connect()
         self.restaurant_schema = self.get_schema('restaurants')
         self.area_schema = self.get_schema('areas')
         self.cuisine_schema = self.get_schema('cuisines')
         self.cuisine_restaurant_relationship_schema = self.get_schema('cuisinesrestaurantsrelationship')
         self.hashtag_consumer_restaurant_relationship_schema = self.get_schema('hashtagsconsumersrestaurantsrelationship')
         self.hashtag_schema = self.get_schema('hashtags')
+        db_conn.close()
 
     @classmethod
-    def get_schema(cls, table_name):
+    def get_schema(cls, db_conn, table_name):
         print("getting schema")
         while True:
             try:
