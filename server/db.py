@@ -17,12 +17,12 @@ class TableSchema:
 
     def __init__(self):
         db_conn = db_engine.connect()
-        self.restaurant_schema = self.get_schema('restaurants')
-        self.area_schema = self.get_schema('areas')
-        self.cuisine_schema = self.get_schema('cuisines')
-        self.cuisine_restaurant_relationship_schema = self.get_schema('cuisinesrestaurantsrelationship')
-        self.hashtag_consumer_restaurant_relationship_schema = self.get_schema('hashtagsconsumersrestaurantsrelationship')
-        self.hashtag_schema = self.get_schema('hashtags')
+        self.restaurant_schema = self.get_schema(db_conn, 'restaurants')
+        self.area_schema = self.get_schema(db_conn, 'areas')
+        self.cuisine_schema = self.get_schema(db_conn, 'cuisines')
+        self.cuisine_restaurant_relationship_schema = self.get_schema(db_conn, 'cuisinesrestaurantsrelationship')
+        self.hashtag_consumer_restaurant_relationship_schema = self.get_schema(db_conn, 'hashtagsconsumersrestaurantsrelationship')
+        self.hashtag_schema = self.get_schema(db_conn, 'hashtags')
         db_conn.close()
 
     @classmethod
