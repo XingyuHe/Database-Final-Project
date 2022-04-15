@@ -1,8 +1,9 @@
 from sqlalchemy import create_engine
-import time
+import os
 
 # DATABASEURI = "postgresql://xh2513:xh2513@w4111.cisxo09blonu.us-east-1.rds.amazonaws.com/proj1part2"
-DATABASEURI = "postgresql://postgres:postgres@database-4111.ce1y1qbvwlr2.us-east-1.rds.amazonaws.com:5432/mydb"
+print(os.environ.get('MYDB_PASSWORD'))
+DATABASEURI = f"postgresql://postgres:{os.environ.get('MYDB_PASSWORD')}@database-4111.ce1y1qbvwlr2.us-east-1.rds.amazonaws.com:5432/mydb"
 db_engine = create_engine(DATABASEURI, connect_args={'connect_timeout': 5})
 
 

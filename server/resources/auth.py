@@ -49,7 +49,9 @@ class Login(Resource):
         error = self.login(request.form)
 
         if error == None:
-            session['username'] = request.form['username']
+            consumer = self.find_user(request.form['username'])
+            session['username'] = consumer['username']
+            session['consumer_id'] = consumer['consumer_id']
             return make_response(redirect('/'))
 
         flash(error)
@@ -81,6 +83,26 @@ class Login(Resource):
             error = "Incorrect password."
 
         return error
+
+
+    @classmethod
+    def find_user(cls, username):
+        try:
+            db_conn = db_engine.connect()
+        except:
+            print("failed to connect to database")
+            abort(500, "<p>Database Error</p>")
+
+        query = """
+        SELECT *
+        FROM Consumers
+        WHERE username=%s
+        """
+
+        result = db_conn.execute(query, username)
+        consumer = result.fetchone()
+        db_conn.close()
+        return consumer
 
 class SignupQuerySchema(Schema):
     username = fields.Str(required=True)

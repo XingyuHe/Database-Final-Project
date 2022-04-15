@@ -1,7 +1,18 @@
+from sqlite3 import IntegrityError
 from flask_restful import Resource
-from flask import abort
+from flask import abort, session, request
+from marshmallow import Schema, fields
 
 from db import db_engine, table_schema
+
+
+class ReservationQuerySchema(Schema):
+    party_size = fields.Int(required=True)
+    party_time = fields.Str(required=True)
+
+
+reservationQuerySchema = ReservationQuerySchema()
+
 
 class Reservation(Resource):
 
@@ -16,7 +27,26 @@ class Reservation(Resource):
             restaurant_id=restaurant_id, restaurant=restaurant_found))
 
         return restaurant_found
-        
+
+    def post(self, restaurant_id):
+
+        if 'username' not in session:
+            return f"<p>Please log in first</p>"
+
+        consumer_id = session['consumer_id']
+        errors = reservationQuerySchema.validate(request.form)
+        if errors:
+            print(str(errors))
+            abort(400, str(errors))
+
+        result = self.make_reservation(
+            consumer_id, restaurant_id, request.form)
+
+        if result:
+            return f"{session['username']} successfully made a reservation at restaurant_id = {restaurant_id} for a party of {request.form['party_size']} on {request.form['party_time']}"
+        else:
+            return f"<p>reservation failed</p>"
+
     @classmethod
     def find_restaurant(cls, restaurant_id):
         try:
@@ -24,22 +54,64 @@ class Reservation(Resource):
         except:
             print("failed to connect to database")
             abort(500, "<p>Database Error</p>")
-        
 
         query = """
         SELECT * FROM {table_name_1} AS R, {table_name_2} AS A
         WHERE restaurant_id=%s and R.zipcode = A.zipcode
         """.format(
-            table_name_1 = cls.__restaurant_table_name__,
-            table_name_2 = cls.__area_table_name__
+            table_name_1=cls.__restaurant_table_name__,
+            table_name_2=cls.__area_table_name__
         )
 
         result = db_conn.execute(query, restaurant_id)
         restaurant = result.fetchone()
         print("restaurant: ", restaurant)
         if restaurant:
-            restaurant = dict(zip(table_schema.restaurant_schema + table_schema.area_schema, restaurant))
+            restaurant = dict(
+                zip(table_schema.restaurant_schema + table_schema.area_schema, restaurant))
         db_conn.close()
         return restaurant
 
+    @classmethod
+    def make_reservation(cls, consumer_id, restaurant_id, form):
+        try:
+            db_conn = db_engine.connect()
+        except:
+            print("failed to connect to database")
+            abort(500, "<p>Database Error</p>")
 
+        insert_query = """
+        INSERT INTO Reservations (consumer_id, restaurant_id, party_size, party_time) VALUES (%s, %s, %s, %s)
+        """
+
+        try:
+            result = db_conn.execute(
+                insert_query,
+                consumer_id, restaurant_id, form['party_size'], form['party_time']
+            )
+        except:
+            abort(500, "Reservation failed")
+
+        search_query = """
+        SELECT *
+        FROM Reservations
+        WHERE consumer_id=%s AND restaurant_id=%s AND party_size=%s AND party_time=%s
+        """
+
+        try:
+            result = db_conn.execute(
+                search_query,
+                consumer_id, restaurant_id, form['party_size'], form['party_time']
+            )
+        except:
+            abort(500, "Reservation failed")
+
+        row = result.fetchone()
+
+        db_conn.close()
+
+        if row:
+            print("successfully made reservation to database: ", row)
+            return row
+        else:
+            return None
