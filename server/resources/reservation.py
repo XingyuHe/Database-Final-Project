@@ -17,6 +17,7 @@ class Reservation(Resource):
 
     __restaurant_table_name__ = "RESTAURANTS"
     __area_table_name__ = "AREAS"
+    __reservation_fail_message__ = f"failed to make a reservation. Make sure your party_time input is in the correct format: '2022-05-01 20:00'"
 
     def get(self, restaurant_id):
 
@@ -47,7 +48,7 @@ class Reservation(Resource):
         if result:
             return make_response(render_template("reservation_success.html"), 200, {'Content-Type': 'text/html'})
         else:
-            return f"failed to make a reservation"
+            return self.__reservation_fail_message__
 
     @classmethod
     def find_restaurant(cls, restaurant_id):
@@ -93,7 +94,7 @@ class Reservation(Resource):
                 consumer_id, restaurant_id, form['party_size'], form['party_time']
             )
         except:
-            abort(500, "Reservation failed")
+            abort(500, cls.__reservation_fail_message__)
 
         search_query = """
         SELECT *
@@ -107,7 +108,7 @@ class Reservation(Resource):
                 consumer_id, restaurant_id, form['party_size'], form['party_time']
             )
         except:
-            abort(500, "Reservation failed")
+            abort(500, cls.__reservation_fail_message__)
 
         row = result.fetchone()
 
