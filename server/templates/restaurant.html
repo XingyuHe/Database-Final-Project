@@ -1,9 +1,7 @@
 {% block content %}
 <div>{{data.att.restaurant_name}}</div>
 <div>
-    <a href='{{data.att.profile_image_url}}'>
-        <button>{{data.att.profile_image_url}}</button>
-    </a>
+    <img src="{{data.att.profile_image_url}}"></img>
 </div>
 <div>
     <a href='/reservation/{{data.att.restaurant_id}}'>

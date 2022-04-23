@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import (
-    abort, jsonify, make_response, render_template
+    abort, make_response, render_template
 )
 
 from db import db_engine, table_schema
