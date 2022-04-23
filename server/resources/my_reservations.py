@@ -24,7 +24,7 @@ class MyReservation(Resource):
                     data=reservations_found),
                 200, {'Content-Type': 'text/html'})
 
-        return {'message': "No reservations found"}
+        return "No reservations found"
 
     @classmethod
     def find_reservations(cls, consumer_id):

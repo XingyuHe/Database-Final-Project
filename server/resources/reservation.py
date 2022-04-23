@@ -45,7 +45,7 @@ class Reservation(Resource):
             consumer_id, restaurant_id, request.form)
 
         if result:
-            return f"{session['username']} successfully made a reservation at restaurant_id = {restaurant_id} for a party of {request.form['party_size']} on {request.form['party_time']}"
+            return make_response(render_template("reservation_success.html"), 200, {'Content-Type': 'text/html'})
         else:
             return f"failed to make a reservation"
 
