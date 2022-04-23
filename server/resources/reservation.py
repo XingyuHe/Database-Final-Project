@@ -20,6 +20,9 @@ class Reservation(Resource):
 
     def get(self, restaurant_id):
 
+        if 'username' not in session:
+            return  make_response(render_template("please_login.html"), 200, {'Content-Type': 'text/html'})
+
         restaurant_found = self.find_restaurant(restaurant_id)
 
         print("restaurant {restaurant_id} found: {restaurant}".format(
@@ -30,7 +33,7 @@ class Reservation(Resource):
     def post(self, restaurant_id):
 
         if 'username' not in session:
-            return  make_response(render_template("please_login.html"), 200, {'Content-Type': 'text/html'})
+            return  "Please login first."
 
         consumer_id = session['consumer_id']
         errors = reservationQuerySchema.validate(request.form)
