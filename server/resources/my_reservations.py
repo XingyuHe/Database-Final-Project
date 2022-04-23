@@ -26,23 +26,6 @@ class MyReservation(Resource):
 
         return {'message': "No reservations found"}
 
-    def delete(self):
-
-        if 'username' not in session:
-            return make_response(
-                render_template("please_login.html"), 200, {'Content-Type': 'text/html'})
-
-        reservations_found = self.find_reservations(session['consumer_id'])
-        print(len(reservations_found))
-        if reservations_found:
-            return make_response(
-                render_template(
-                    "reservations_found.html",
-                    data=reservations_found),
-                200, {'Content-Type': 'text/html'})
-
-        return {'message': "No reservations found"}
-
     @classmethod
     def find_reservations(cls, consumer_id):
         try:
